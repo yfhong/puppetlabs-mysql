@@ -34,28 +34,29 @@ class mysql::params {
 
   case $::osfamily {
     'RedHat': {
-      case $::operatingsystem {
-        'Fedora': {
-          if versioncmp($::operatingsystemrelease, '19') >= 0 or $::operatingsystemrelease == 'Rawhide' {
-            $provider = 'mariadb'
-          } else {
-            $provider = 'mysql'
-          }
-        }
-        /^(RedHat|CentOS|Scientific|OracleLinux)$/: {
-          if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
-            $provider = 'mariadb'
-          } else {
-            $provider = 'mysql'
-          }
-        }
-        default: {
-          $provider = 'mysql'
-        }
-      }
-
       if ($use_community_repo) {
         $provider = 'community'
+      }
+      else {
+        case $::operatingsystem {
+          'Fedora': {
+            if versioncmp($::operatingsystemrelease, '19') >= 0 or $::operatingsystemrelease == 'Rawhide' {
+              $provider = 'mariadb'
+              } else {
+              $provider = 'mysql'
+              }
+          }
+          /^(RedHat|CentOS|Scientific|OracleLinux)$/: {
+            if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
+              $provider = 'mariadb'
+              } else {
+              $provider = 'mysql'
+              }
+          }
+          default: {
+            $provider = 'mysql'
+          }
+        }
       }
 
       if $provider == 'mariadb' {
