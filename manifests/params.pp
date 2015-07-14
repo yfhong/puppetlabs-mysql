@@ -30,6 +30,7 @@ class mysql::params {
   $daemon_dev_package_ensure   = 'present'
   $daemon_dev_package_provider = undef
 
+  $use_community_repo = hiera('mysql::use_community_repo', false)
 
   case $::osfamily {
     'RedHat': {
@@ -53,6 +54,10 @@ class mysql::params {
         }
       }
 
+      if ($use_community_repo) {
+        $provider = 'community'
+      }
+
       if $provider == 'mariadb' {
         $client_package_name = 'mariadb'
         $server_package_name = 'mariadb-server'
@@ -62,7 +67,17 @@ class mysql::params {
         # mariadb package by default has !includedir set in my.cnf to /etc/my.cnf.d
         $includedir          = undef
         $pidfile             = '/var/run/mariadb/mariadb.pid'
-      } else {
+      }
+      elsif $provider == 'comunity' {
+        $client_package_name = 'mysql-community-client'
+        $server_package_name = 'mysql-community-server'
+        $server_service_name = 'mysqld'
+        $log_error           = '/var/log/mysqld.log'
+        $config_file         = '/etc/my.cnf'
+        $includedir          = '/etc/my.cnf.d'
+        $pidfile             = '/var/run/mysqld/mysqld.pid'
+      }
+      else {
         $client_package_name = 'mysql'
         $server_package_name = 'mysql-server'
         $server_service_name = 'mysqld'
